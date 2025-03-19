@@ -3,7 +3,7 @@ class Solution {
         int minOperations(vector<int>& nums) {
             int n = nums.size(),minOp = 0;
     
-            //brute force approach / greedy approach
+            //greedy approach
             //just find 0 and perform op and keep track
             for (int i = 0; i < n; i ++) {
                 //if fnd 0 inc minOp
