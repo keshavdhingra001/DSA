@@ -1,30 +1,42 @@
 class Solution {
 public:
-    int countDays(int days, vector<vector<int>>& meetings) {
-        if (meetings.empty()) return days; // No meetings, all days are free
-        //Sort meetings by start day
-        sort(meetings.begin(), meetings.end());
-        int freeDays = 0;
-        int prevEnd = 0; // Track the last merged meeting end time
-        //Merge overlapping meetings & count free days
-        for (auto& meeting : meetings) {
-            int start = meeting[0], end = meeting[1];
-            if (start > prevEnd + 1) {
-                // Count free days between non-overlapping meetings
-                freeDays += (start - prevEnd - 1);
+    //chck if possible to make at least 2 valid cuts
+    bool canCut(vector<vector<int>> rects, int k) {
+        //sort rect based on the k-th coordinate (either x or y)
+        sort(rects.begin(), rects.end(), [k](const vector<int>& rect1, const vector<int>& rect2) {
+            return rect1[k] < rect2[k]; 
+        });
+        
+        //cnt valid cuts
+        int cutCnt = 0;
+        //tracks max endpoint
+        int maxEndpt = rects[0][k + 2];
+
+        //iterate through rects to chck for valid cuts
+        for (int i = 1; i < rects.size(); i++) {
+            int start = rects[i][k];    //str of crnt rect
+            int end = rects[i][k + 2]; //end of crnt rect
+            
+            //if valid gap, inc cutCnt
+            if (maxEndpt <= start) {
+                cutCnt++;
             }
-            // Update the last merged meeting end
-            prevEnd = max(prevEnd, end);
+            
+            //update maxEndpt
+            maxEndpt = max(maxEndpt, end);
         }
-        //Count free days after the last meeting
-        freeDays += (days - prevEnd);
-        return freeDays;
+        
+        //at least 2 valid cuts should be present
+        return cutCnt >= 2;
+    }
+
+    //chck if grid can be divided into sections
+    bool checkValidCuts(int n, const vector<vector<int>>& rectangles) {
+        return canCut(rectangles, 0) || canCut(rectangles, 1);
     }
 };
-/* App - Sort the meetings by start time
-         Merge overlapping intervals
-         Count free days before first meeting, between merged meetings, and after last meeting
+/* App - chcks if grid can be divided into at least 2 valid sections 
+        using vert or horz cuts based on coord sorting.
 */
-
-// TC - O(N log N), sorting takes O(N log N) and merging runs in O(N)
-// SC - O(1), only a few integer variables are used
+// TC - O(n log n), where n is num of rects (sorting complexity)
+// SC - O(n), due to copy of rects for sorting
